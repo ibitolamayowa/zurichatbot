@@ -12,6 +12,7 @@ import (
 type PostRequest struct {
 	AccessToken string `json:"access_token"`
 	Message     string `json:"message"`
+	ImagePath   string `json:"image_path"`
 }
 
 func PostToPage(w http.ResponseWriter, r *http.Request) {
@@ -23,14 +24,29 @@ func PostToPage(w http.ResponseWriter, r *http.Request) {
 		utils.GetError(err, http.StatusUnprocessableEntity, w)
 		return
 	}
+
 	method := "POST"
 	Url, err := url.Parse("https://graph.facebook.com/" + page_id + "/feed")
 	if err != nil {
 		panic("boom")
 	}
 	parameters := url.Values{}
-	parameters.Add("message", pq.Message)
+
+	if pq.ImagePath != "" {
+		Url, err = url.Parse("https://graph.facebook.com/" + page_id + "/photos")
+		if err != nil {
+			panic("boom")
+		}
+		parameters = url.Values{}
+		parameters.Add("url", pq.ImagePath)
+	}
+
 	parameters.Add("access_token", pq.AccessToken)
+
+	if pq.Message != "" {
+		parameters.Add("message", pq.Message)
+	}
+
 	Url.RawQuery = parameters.Encode()
 	client := &http.Client{}
 	req, err := http.NewRequest(method, Url.String(), nil)
