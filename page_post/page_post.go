@@ -66,5 +66,9 @@ func PostToPage(w http.ResponseWriter, r *http.Request) {
 		utils.GetError(err, http.StatusInternalServerError, w)
 		return
 	}
+	if res.StatusCode != http.StatusOK {
+		utils.GetDetailedError(string(body), res.StatusCode, "", w)
+		return
+	}
 	utils.GetSuccess("posted succesfully", string(body), w)
 }
