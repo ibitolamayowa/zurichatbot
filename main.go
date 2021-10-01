@@ -19,6 +19,7 @@ func Router() *mux.Router {
 	r := mux.NewRouter().StrictSlash(true)
 
 	r.HandleFunc("/posts/page/{page_id}", page_post.PostToPage).Methods("POST")
+	r.HandleFunc("/", VersionHandler)
 
 	return r
 }
